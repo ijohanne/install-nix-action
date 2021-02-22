@@ -21,12 +21,19 @@ fi
 
 # Nix installer flags
 installer_options=(
-  --daemon
-  --daemon-user-count 4
   --no-channel-add
   --darwin-use-unencrypted-nix-store-volume
   --nix-extra-conf-file /tmp/nix.conf
 )
+
+# If --no-daemon isn't passed in, we'll assume multi-user with systemd
+if [[ ! $INPUT_INSTALL_OPTIONS =~ "--no-daemon" ]]; then
+  installer_options += (
+    --daemon
+    --daemon-user-count 4
+  );
+fi
+
 if [[ $INPUT_INSTALL_OPTIONS != "" ]]; then
   IFS=' ' read -r -a extra_installer_options <<< $INPUT_INSTALL_OPTIONS
   installer_options=("${extra_installer_options[@]}" "${installer_options[@]}")
@@ -34,8 +41,8 @@ fi
 
 echo "installer options: ${installer_options[@]}"
 # On self-hosted runners we don't need to install more than once
-if [[ ! -d /nix/store ]] 
-then 
+if [[ ! -d /nix/store ]]
+then
   sh <(curl --retry 5 --retry-connrefused -L "${INPUT_INSTALL_URL:-https://nixos.org/nix/install}") "${installer_options[@]}"
 fi
 
