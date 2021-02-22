@@ -29,6 +29,20 @@ installer_options=(
 # If --no-daemon isn't passed in, we'll assume multi-user with systemd
 if [[ ! $INPUT_INSTALL_OPTIONS =~ "--no-daemon" ]]; then
   installer_options+=( "--daemon" "--daemon-user-count 4" )
+else
+  groupadd -g 30000 --system nixbld
+  for i in $(seq 1 32); do
+    useradd \
+      --home-dir /var/empty \
+      --gid 30000 \
+      --groups nixbld \
+      --no-user-group \
+      --system \
+      --shell /usr/sbin/nologin \
+      --uid $((30000 + i)) \
+      --password "!" \
+      nixbld$i
+  done
 fi
 
 if [[ $INPUT_INSTALL_OPTIONS != "" ]]; then
