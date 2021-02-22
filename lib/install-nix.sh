@@ -28,10 +28,7 @@ installer_options=(
 
 # If --no-daemon isn't passed in, we'll assume multi-user with systemd
 if [[ ! $INPUT_INSTALL_OPTIONS =~ "--no-daemon" ]]; then
-  installer_options+=(
-    "--daemon"
-    "--daemon-user-count 4"
-  )
+  installer_options+=( "--daemon" "--daemon-user-count 4" )
 fi
 
 if [[ $INPUT_INSTALL_OPTIONS != "" ]]; then
